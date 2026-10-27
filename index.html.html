@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TASTE & CRAFT | 味覺影院 - 極致美食烹飪大師課</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Movie & Culinary Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cinzel & Noto Serif TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Noto+Serif+TC:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cinematic: {
+                            black: '#0a0808',
+                            deep: '#120c0c',
+                            burgundy: '#2d0a0e',
+                            gold: '#dfac44',
+                            goldLight: '#f6d785',
+                            cream: '#f4efe6'
+                        }
+                    },
+                    fontFamily: {
+                        cinematic: ['Cinzel', 'Noto Serif TC', 'serif'],
+                        serif: ['Noto Serif TC', 'serif']
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Cinematic Styles & Grain Effect */
+        body {
+            background-color: #0a0808;
+            color: #f4efe6;
+            font-family: 'Noto Serif TC', serif;
+            overflow-x: hidden;
+        }
+
+        /* Film Grain Canvas Overlay */
+        #grain-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99;
+            opacity: 0.07;
+        }
+
+        /* Vignette Effect */
+        .vignette {
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
+        }
+
+        /* Metallic Gold Gradient Text */
+        .text-gold-gradient {
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .border-gold-gradient {
+            border-image: linear-gradient(to right, #bf953f, #fcf6ba, #b38728) 1;
+        }
+
+        /* Letterbox bars animation */
+        .letterbox-top, .letterbox-bottom {
+            position: fixed;
+            left: 0;
+            right: 0;
+            height: 8vh;
+            background: #000;
+            z-index: 60;
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .letterbox-top { top: 0; }
+        .letterbox-bottom { bottom: 0; }
+
+        .intro-hide .letterbox-top { transform: translateY(-100%); }
+        .intro-hide .letterbox-bottom { transform: translateY(100%); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0808;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d0a0e;
+            border: 1px solid #dfac44;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #dfac44;
+        }
+
+        /* Film Strip Perforations */
+        .film-strip-border {
+            background-image: radial-gradient(#0a0808 30%, transparent 31%);
+            background-size: 16px 16px;
+            background-position: 0 0;
+        }
+    </style>
+</head>
+<body class="bg-cinematic-black text-cinematic-cream relative">
+
+    <!-- Canvas for Noise/Film Grain Overlay -->
+    <canvas id="grain-canvas"></canvas>
+
+    <!-- Audio FX Synth (Web Audio API driven) -->
+    <div id="audio-control" class="fixed bottom-6 right-6 z-50 flex items-center space-x-2 bg-black/70 backdrop-blur-md border border-cinematic-gold/40 px-4 py-2 rounded-full cursor-pointer hover:border-cinematic-gold transition-all duration-300 group">
+        <i id="audio-icon" class="fas fa-volume-xmark text-cinematic-gold group-hover:scale-110 transition-transform"></i>
+        <span id="audio-text" class="text-xs font-cinematic uppercase tracking-widest text-cinematic-gold">放映聲效: 關閉</span>
+    </div>
+
+    <!-- Cinematic Letterbox Frames -->
+    <div class="letterbox-top"></div>
+    <div class="letterbox-bottom"></div>
+
+    <!-- SKIP INTRO BUTTON -->
+    <button id="skip-intro-btn" onclick="skipIntro()" class="fixed top-12 right-8 z-50 bg-black/60 border border-cinematic-gold/60 text-cinematic-gold hover:bg-cinematic-gold hover:text-black px-5 py-2 rounded-full text-xs font-cinematic uppercase tracking-widest transition-all duration-300 shadow-lg backdrop-blur-sm">
+        跳過片頭 <i class="fas fa-forward ml-1"></i>
+    </button>
+
+    <!-- ========================================== -->
+    <!-- 1. MOVIE-STYLE OPENING INTRO ANIMATION CONTAINER -->
+    <!-- ========================================== -->
+    <div id="intro-sequence" class="fixed inset-0 z-40 bg-cinematic-black flex flex-col items-center justify-center p-4 overflow-hidden">
+        
+        <!-- Ambient Lighting Glow Background -->
+        <div class="absolute w-[600px] h-[600px] bg-cinematic-burgundy/30 rounded-full blur-[120px] pointer-events-none animate-pulse-slow"></div>
+        <div class="absolute w-[300px] h-[300px] bg-cinematic-gold/10 rounded-full blur-[80px] pointer-events-none"></div>
+
+        <!-- STAGE 1: Studio Logo Presenting -->
+        <div id="intro-stage-1" class="text-center opacity-0 transition-opacity duration-1000">
+            <p class="text-cinematic-gold/70 uppercase tracking-[0.4em] text-xs md:text-sm font-cinematic mb-3">A Culinary Epic Production</p>
+            <h2 class="text-2xl md:text-4xl text-cinematic-cream font-serif font-light tracking-[0.2em] uppercase">
+                味覺頂級影業 <span class="text-cinematic-gold font-bold">榮譽呈現</span>
+            </h2>
+            <div class="w-16 h-[1px] bg-cinematic-gold/40 mx-auto mt-6"></div>
+        </div>
+
+        <!-- STAGE 2: Title Card Animation -->
+        <div id="intro-stage-2" class="hidden text-center opacity-0 transition-all duration-1000 transform scale-95">
+            <p class="text-cinematic-gold tracking-[0.3em] text-xs uppercase mb-4">Presented In Ultra-HD Flavor</p>
+            <h1 class="text-4xl md:text-7xl lg:text-8xl font-black font-cinematic tracking-wider mb-4 text-gold-gradient drop-shadow-2xl">
+                TASTE & CRAFT
+            </h1>
+            <h3 class="text-xl md:text-3xl font-serif text-cinematic-cream tracking-[0.35em] font-light">
+                美 食 烹 飪 的 藝 術 殿 堂
+            </h3>
+            <p class="mt-6 text-xs text-cinematic-gold/60 tracking-widest uppercase">Chapter I: The Awakening of Senses</p>
+        </div>
+
+        <!-- STAGE 3: Rolling Opening Credits -->
+        <div id="intro-stage-3" class="hidden text-center opacity-0 transition-opacity duration-1000 max-w-xl">
+            <div id="credit-content" class="space-y-6">
+                <!-- Dynamically populated credits -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 2. MAIN LANDING PAGE CONTENT (Revealed after intro) -->
+    <!-- ========================================== -->
+    <div id="main-content" class="opacity-0 transition-opacity duration-1000 pointer-events-none min-h-screen pb-20">
+        
+        <!-- NAVIGATION BAR -->
+        <nav class="sticky top-0 z-30 bg-cinematic-black/80 backdrop-blur-md border-b border-cinematic-gold/20 px-6 py-4 transition-all">
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                <a href="#" class="flex items-center space-x-3 group">
+                    <i class="fas fa-clapperboard text-cinematic-gold text-2xl group-hover:rotate-12 transition-transform"></i>
+                    <span class="font-cinematic text-xl font-bold tracking-wider text-gold-gradient">CULINARY EPIC</span>
+                </a>
+
+                <div class="hidden md:flex items-center space-x-8 text-sm font-serif tracking-wider text-cinematic-cream/80">
+                    <a href="#featured" class="hover:text-cinematic-gold transition-colors">最新映期 (Featured)</a>
+                    <a href="#masterclasses" class="hover:text-cinematic-gold transition-colors">大師課程 (Masterclasses)</a>
+                    <a href="#chefs" class="hover:text-cinematic-gold transition-colors">主演名廚 (Cast)</a>
+                    <a href="#about" class="hover:text-cinematic-gold transition-colors">關於影院 (About)</a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <button onclick="openTrailerModal('hero')" class="bg-gradient-to-r from-cinematic-gold to-yellow-600 text-black px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all flex items-center space-x-2">
+                        <i class="fas fa-play text-xs"></i>
+                        <span>觀看預告片</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- HERO BANNER SECTION -->
+        <header class="relative min-h-[85vh] flex items-center justify-center overflow-hidden vignette">
+            <!-- Background Image with Cinematic Overlay -->
+            <div class="absolute inset-0 z-0">
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80" alt="Cinematic Chef Cooking" class="w-full h-full object-cover opacity-35 scale-105 animate-pulse-slow">
+                <div class="absolute inset-0 bg-gradient-to-t from-cinematic-black via-cinematic-black/40 to-cinematic-black/80"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-cinematic-black via-transparent to-cinematic-black"></div>
+            </div>
+
+            <div class="relative z-10 text-center max-w-4xl mx-auto px-6 py-12">
+                <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full border border-cinematic-gold/40 bg-cinematic-burgundy/40 backdrop-blur-md mb-6">
+                    <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                    <span class="text-xs text-cinematic-gold tracking-widest uppercase font-cinematic">Now Showing • 全新巨獻</span>
+                </div>
+
+                <h1 class="text-4xl sm:text-6xl md:text-7xl font-black tracking-wider text-cinematic-cream mb-6 font-cinematic leading-tight">
+                    將每一道佳餚 <br>
+                    <span class="text-gold-gradient">締造成電影般的經典作品</span>
+                </h1>
+
+                <p class="text-lg md:text-xl text-cinematic-cream/70 font-serif max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+                    踏入頂級米其林大師的光影廚房。探索法式醬汁的秘辛、日式刀工的極致精準與頂級烘焙的工藝靈魂。
+                </p>
+
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <a href="#masterclasses" class="w-full sm:w-auto px-8 py-4 bg-cinematic-gold text-black font-bold rounded-full text-sm tracking-widest uppercase hover:bg-cinematic-goldLight transition-all transform hover:-translate-y-0.5 shadow-lg shadow-cinematic-gold/20 flex items-center justify-center space-x-2">
+                        <span>開啟大師學習之旅</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <button onclick="openTrailerModal('hero')" class="w-full sm:w-auto px-8 py-4 bg-cinematic-burgundy/60 border border-cinematic-gold/40 text-cinematic-cream font-serif rounded-full text-sm tracking-widest hover:bg-cinematic-burgundy hover:border-cinematic-gold transition-all flex items-center justify-center space-x-2">
+                        <i class="fas fa-film text-cinematic-gold"></i>
+                        <span>觀看試映會 (Trailer)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Film Strip Bottom Decorative Accent -->
+            <div class="absolute bottom-0 left-0 right-0 h-4 bg-cinematic-gold/20 flex justify-between items-center px-2 overflow-hidden">
+                <div class="w-full h-2 border-b-2 border-dashed border-cinematic-gold/40"></div>
+            </div>
+        </header>
+
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="max-w-7xl mx-auto px-6 mt-16 space-y-24">
+
+            <!-- SECTION: SEARCH & FILTER BAR -->
+            <section id="masterclasses" class="space-y-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-cinematic-gold/20 pb-6">
+                    <div>
+                        <div class="text-cinematic-gold text-xs font-cinematic tracking-[0.3em] uppercase mb-1">PROGRAM CATALOGUE</div>
+                        <h2 class="text-3xl md:text-4xl font-bold font-serif text-cinematic-cream">首輪映期課程列表</h2>
+                    </div>
+
+                    <!-- Search & Filter Controls -->
+                    <div class="flex flex-wrap gap-3">
+                        <!-- Search Box -->
+                        <div class="relative min-w-[200px]">
+                            <input type="text" id="search-input" placeholder="搜尋菜式、大師或技法..." 
+                                   class="w-full bg-cinematic-deep border border-cinematic-gold/30 rounded-lg px-4 py-2.5 text-sm text-cinematic-cream placeholder-cinematic-cream/40 focus:outline-none focus:border-cinematic-gold transition-colors pl-10">
+                            <i class="fas fa-search absolute left-3.5 top-3.5 text-cinematic-gold/60 text-xs"></i>
+                        </div>
+
+                        <!-- Cuisine Filter -->
+                        <select id="cuisine-filter" class="bg-cinematic-deep border border-cinematic-gold/30 rounded-lg px-4 py-2.5 text-sm text-cinematic-cream focus:outline-none focus:border-cinematic-gold cursor-pointer">
+                            <option value="all">所有菜系 (All Cuisines)</option>
+                            <option value="french">法式料理 (French)</option>
+                            <option value="japanese">日式懷石 (Japanese)</option>
+                            <option value="baking">歐式烘焙 (Baking)</option>
+                            <option value="italian">義式經典 (Italian)</option>
+                        </select>
+
+                        <!-- Level Filter -->
+                        <select id="level-filter" class="bg-cinematic-deep border border-cinematic-gold/30 rounded-lg px-4 py-2.5 text-sm text-cinematic-cream focus:outline-none focus:border-cinematic-gold cursor-pointer">
+                            <option value="all">全技能階級 (All Levels)</option>
+                            <option value="beginner">入門大師課 (Beginner)</option>
+                            <option value="intermediate">進階匠藝 (Intermediate)</option>
+                            <option value="advanced">米其林高階 (Advanced)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- MOVIE POSTER STYLE COURSE CARDS GRID -->
+                <div id="course-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Cards will be dynamically loaded via JS -->
+                </div>
+            </section>
+
+
+            <!-- SECTION: FEATURED CHEFS (STAR CAST STYLE) -->
+            <section id="chefs" class="space-y-8 bg-cinematic-deep/60 p-8 md:p-12 rounded-2xl border border-cinematic-gold/20 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-96 h-96 bg-cinematic-burgundy/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <p class="text-cinematic-gold text-xs font-cinematic tracking-[0.3em] uppercase mb-2">STAR CAST & DIRECTORS</p>
+                    <h2 class="text-3xl md:text-4xl font-bold font-serif">主演領銜廚藝大師</h2>
+                    <p class="text-sm text-cinematic-cream/60 mt-2 font-serif">來自全球星級餐廳主廚，親自執導您的烹飪視覺盛宴</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Chef 1 -->
+                    <div class="group relative bg-black rounded-xl overflow-hidden border border-cinematic-gold/20 hover:border-cinematic-gold transition-all duration-500 hover:-translate-y-2">
+                        <div class="aspect-[3/4] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=800&q=80" alt="Chef Antoine Laurent" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 filter grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                        <div class="absolute bottom-0 p-5 w-full">
+                            <span class="text-xs text-cinematic-gold tracking-widest font-cinematic uppercase">Master of Sauces</span>
+                            <h3 class="text-xl font-bold font-serif text-cinematic-cream">Antoine Laurent</h3>
+                            <p class="text-xs text-cinematic-cream/60 mt-1">巴黎米其林三星主廚 • 30年經驗</p>
+                        </div>
+                    </div>
+
+                    <!-- Chef 2 -->
+                    <div class="group relative bg-black rounded-xl overflow-hidden border border-cinematic-gold/20 hover:border-cinematic-gold transition-all duration-500 hover:-translate-y-2">
+                        <div class="aspect-[3/4] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=800&q=80" alt="Chef Kenji Takahashi" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 filter grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                        <div class="absolute bottom-0 p-5 w-full">
+                            <span class="text-xs text-cinematic-gold tracking-widest font-cinematic uppercase">Precision Blade Craft</span>
+                            <h3 class="text-xl font-bold font-serif text-cinematic-cream">高橋 健二 (Kenji)</h3>
+                            <p class="text-xs text-cinematic-cream/60 mt-1">東京懷石料理宗師 • 極致刀工傳人</p>
+                        </div>
+                    </div>
+
+                    <!-- Chef 3 -->
+                    <div class="group relative bg-black rounded-xl overflow-hidden border border-cinematic-gold/20 hover:border-cinematic-gold transition-all duration-500 hover:-translate-y-2">
+                        <div class="aspect-[3/4] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1607631568010-a87245c0daf8?auto=format&fit=crop&w=800&q=80" alt="Chef Elena Russo" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 filter grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                        <div class="absolute bottom-0 p-5 w-full">
+                            <span class="text-xs text-cinematic-gold tracking-widest font-cinematic uppercase">Artisanal Bakery</span>
+                            <h3 class="text-xl font-bold font-serif text-cinematic-cream">Elena Russo</h3>
+                            <p class="text-xs text-cinematic-cream/60 mt-1">佛羅倫斯烘焙大師 • 天然酸酵專家</p>
+                        </div>
+                    </div>
+
+                    <!-- Chef 4 -->
+                    <div class="group relative bg-black rounded-xl overflow-hidden border border-cinematic-gold/20 hover:border-cinematic-gold transition-all duration-500 hover:-translate-y-2">
+                        <div class="aspect-[3/4] overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=800&q=80" alt="Chef Marcus Vance" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 filter grayscale group-hover:grayscale-0">
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90"></div>
+                        <div class="absolute bottom-0 p-5 w-full">
+                            <span class="text-xs text-cinematic-gold tracking-widest font-cinematic uppercase">Modern Molecular</span>
+                            <h3 class="text-xl font-bold font-serif text-cinematic-cream">Marcus Vance</h3>
+                            <p class="text-xs text-cinematic-cream/60 mt-1">前衛分子料理先驅 • 視覺解構藝術</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="mt-24 border-t border-cinematic-gold/20 pt-12 pb-8 bg-black">
+            <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-clapperboard text-cinematic-gold text-2xl"></i>
+                    <span class="font-cinematic text-lg font-bold tracking-wider text-gold-gradient">TASTE & CRAFT FILM STUDIO</span>
+                </div>
+                <div class="text-xs text-cinematic-cream/50 font-serif">
+                    © 2026 TASTE & CRAFT FILM STUDIO. 版權所有 • 演繹極致味覺視覺藝術
+                </div>
+                <div class="flex space-x-4 text-cinematic-gold/70 text-sm">
+                    <a href="#" class="hover:text-cinematic-gold"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="hover:text-cinematic-gold"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="hover:text-cinematic-gold"><i class="fab fa-vimeo-v"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 3. INTERACTIVE TRAILER MODAL -->
+    <!-- ========================================== -->
+    <div id="trailer-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="relative w-full max-w-4xl bg-cinematic-deep border border-cinematic-gold/40 rounded-2xl overflow-hidden shadow-2xl">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-cinematic-gold/20 bg-black/50">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-film text-cinematic-gold"></i>
+                    <span id="modal-title" class="font-serif font-bold text-cinematic-cream">大師課程預告片 (Official Trailer)</span>
+                </div>
+                <button onclick="closeTrailerModal()" class="text-cinematic-cream/60 hover:text-cinematic-gold transition-colors p-1">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Video / Preview Player Container -->
+            <div class="relative aspect-video bg-black flex items-center justify-center overflow-hidden">
+                <img id="modal-poster" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center p-6 text-center">
+                    <div class="w-20 h-20 rounded-full bg-cinematic-gold/90 text-black flex items-center justify-center text-2xl shadow-lg hover:scale-110 transition-transform cursor-pointer" onclick="playMockVideo()">
+                        <i class="fas fa-play ml-1"></i>
+                    </div>
+                    <p id="modal-desc" class="mt-4 text-sm text-cinematic-cream/80 max-w-md font-serif">
+                        點擊播放影院級 4K 課程精華片段 (High-Definition Featurette)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Modal Footer Details -->
+            <div class="p-6 bg-black/40 flex justify-between items-center">
+                <div>
+                    <span id="modal-instructor" class="text-xs text-cinematic-gold font-cinematic uppercase tracking-wider">DIRECTOR: ANTOINE LAURENT</span>
+                    <h4 id="modal-subtitle" class="text-lg font-bold font-serif text-cinematic-cream">法式母醬的終極演繹</h4>
+                </div>
+                <button class="px-6 py-2.5 bg-cinematic-gold text-black rounded-full font-bold text-xs uppercase tracking-wider hover:bg-cinematic-goldLight transition-colors">
+                    立即報名課程
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 4. JAVASCRIPT LOGIC & ANIMATION ENGINE -->
+    <!-- ========================================== -->
+    <script>
+        // --- COURSE DATA (Mock Film Catalogue) ---
+        const courses = [
+            {
+                id: 1,
+                title: "法式經典母醬的靈魂法則",
+                englishTitle: "THE ART OF FRENCH SAUCES",
+                director: "Antoine Laurent",
+                cuisine: "french",
+                level: "intermediate",
+                duration: "120 分鐘 • 8 集大師課",
+                rating: "9.9 / 10",
+                badge: "米其林三星",
+                image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+                desc: "解構 Béarnaise、Velouté 與 Hollandaise 醬汁的溫度控制與乳化化學。"
+            },
+            {
+                id: 2,
+                title: "日式懷石：鋼刃與食材的對話",
+                englishTitle: "KNIFE SKILLS & KAISEKI",
+                director: "高橋 健二 (Kenji)",
+                cuisine: "japanese",
+                level: "advanced",
+                duration: "150 分鐘 • 10 集大師課",
+                rating: "9.8 / 10",
+                badge: "傳統匠藝",
+                image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80",
+                desc: "從刺身精密切割到季節魚鮮提味，探討日式料理哲學中「切」的極致精準。"
+            },
+            {
+                id: 3,
+                title: "野生天然酸酵與古法烘焙",
+                englishTitle: "SOURDOUGH & ARTISANAL BREAD",
+                director: "Elena Russo",
+                cuisine: "baking",
+                level: "beginner",
+                duration: "90 分鐘 • 6 集大師課",
+                rating: "9.7 / 10",
+                badge: "熱門首映",
+                image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80",
+                desc: "培養百年酵母菌種，掌握高水和度麵糰的發酵氣孔與酥脆薄殼的誕生。"
+            },
+            {
+                id: 4,
+                title: "義式手工手工麵體與極致醬汁",
+                englishTitle: "PASTA FROM SCRATCH",
+                director: "Marco Bellini",
+                cuisine: "italian",
+                level: "beginner",
+                duration: "105 分鐘 • 7 集大師課",
+                rating: "9.9 / 10",
+                badge: "主廚推薦",
+                image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80",
+                desc: "從麵粉比例、蛋黃壓制到揉捏拉伸，打造透光般完美的傳統義式手工麵條。"
+            },
+            {
+                id: 5,
+                title: "前衛分子料理與視覺解構",
+                englishTitle: "MOLECULAR GASTRONOMY",
+                director: "Marcus Vance",
+                cuisine: "french",
+                level: "advanced",
+                duration: "180 分鐘 • 12 集大師課",
+                rating: "9.6 / 10",
+                badge: "前衛實驗",
+                image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=800&q=80",
+                desc: "運用晶球化、液態氮與低溫慢煮 (Sous-vide)，翻轉傳統風味的視覺呈現。"
+            },
+            {
+                id: 6,
+                title: "法式極致甜點與巧克力雕塑",
+                englishTitle: "CHOCOLATE & PASTRY ART",
+                director: "Sophie Martin",
+                cuisine: "baking",
+                level: "intermediate",
+                duration: "140 分鐘 • 9 集大師課",
+                rating: "9.9 / 10",
+                badge: "視覺大獎",
+                image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80",
+                desc: "精準控溫調溫巧克力，學習溫潤鏡面光澤與高級法式塔派的結構力學。"
+            }
+        ];
+
+        // --- FILM GRAIN GENERATOR ---
+        function initGrain() {
+            const canvas = document.getElementById('grain-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            function loop() {
+                const imageData = ctx.createImageData(width, height);
+                const data = imageData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const noise = Math.random() * 255;
+                    data[i] = noise;
+                    data[i+1] = noise;
+                    data[i+2] = noise;
+                    data[i+3] = 25; // low opacity
+                }
+                ctx.putImageData(imageData, 0, 0);
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        // --- WEB AUDIO API SOUND SYNTH (Projector Ambient Effect) ---
+        let audioCtx = null;
+        let projectorNoise = null;
+        let isAudioPlaying = false;
+
+        function toggleAudio() {
+            const btnText = document.getElementById('audio-text');
+            const btnIcon = document.getElementById('audio-icon');
+
+            if (!isAudioPlaying) {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                // Create soft noise buffer for old film projector humming sound
+                const bufferSize = audioCtx.sampleRate * 2;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = (Math.random() * 2 - 1) * 0.015; // Low volume noise
+                }
+
+                projectorNoise = audioCtx.createBufferSource();
+                projectorNoise.buffer = buffer;
+                projectorNoise.loop = true;
+
+                // Lowpass Filter for warm ambient sound
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+
+                projectorNoise.connect(filter);
+                filter.connect(audioCtx.destination);
+                projectorNoise.start();
+
+                isAudioPlaying = true;
+                btnText.textContent = "放映聲效: 播放中";
+                btnIcon.className = "fas fa-volume-high text-cinematic-gold";
+            } else {
+                if (projectorNoise) {
+                    projectorNoise.stop();
+                }
+                isAudioPlaying = false;
+                btnText.textContent = "放映聲效: 關閉";
+                btnIcon.className = "fas fa-volume-xmark text-cinematic-gold";
+            }
+        }
+
+        document.getElementById('audio-control').addEventListener('click', toggleAudio);
+
+
+        // --- OPENING INTRO ANIMATION TIMELINE ---
+        const creditsData = [
+            { role: "執導大師 (DIRECTED BY)", name: "Chef Antoine Laurent & Master Kenji" },
+            { role: "領銜主演 (STARRING)", name: "法式精緻醬汁 • 日式精密刀工 • 歐式天然發酵" },
+            { role: "攝影指導 (CINEMATOGRAPHY)", name: "極致 4K 影音畫質 • 味覺與視覺交響曲" }
+        ];
+
+        let currentStage = 1;
+        let introTimer = null;
+
+        function runIntroSequence() {
+            const stage1 = document.getElementById('intro-stage-1');
+            const stage2 = document.getElementById('intro-stage-2');
+            const stage3 = document.getElementById('intro-stage-3');
+            const creditContent = document.getElementById('credit-content');
+
+            // Stage 1 Fade In
+            setTimeout(() => {
+                stage1.classList.remove('opacity-0');
+            }, 300);
+
+            // Stage 1 Fade Out -> Stage 2 Fade In (Title Reveal)
+            setTimeout(() => {
+                stage1.classList.add('opacity-0');
+                setTimeout(() => {
+                    stage1.classList.add('hidden');
+                    stage2.classList.remove('hidden');
+                    setTimeout(() => {
+                        stage2.classList.remove('opacity-0', 'scale-95');
+                        stage2.classList.add('scale-100');
+                    }, 100);
+                }, 1000);
+            }, 3000);
+
+            // Stage 2 Fade Out -> Stage 3 (Rolling Credits)
+            setTimeout(() => {
+                stage2.classList.add('opacity-0');
+                setTimeout(() => {
+                    stage2.classList.add('hidden');
+                    stage3.classList.remove('hidden');
+                    stage3.classList.remove('opacity-0');
+
+                    // Render Credits sequentially
+                    creditsData.forEach((credit, idx) => {
+                        setTimeout(() => {
+                            const div = document.createElement('div');
+                            div.className = "transition-all duration-700 transform translate-y-4 opacity-0";
+                            div.innerHTML = `
+                                <p class="text-xs text-cinematic-gold uppercase tracking-[0.4em] font-cinematic">${credit.role}</p>
+                                <p class="text-lg md:text-xl text-cinematic-cream font-serif mt-1 font-semibold">${credit.name}</p>
+                            `;
+                            creditContent.appendChild(div);
+                            setTimeout(() => {
+                                div.classList.remove('translate-y-4', 'opacity-0');
+                            }, 50);
+                        }, idx * 1800);
+                    });
+                }, 1000);
+            }, 7000);
+
+            // Finish Intro Automatically
+            setTimeout(() => {
+                skipIntro();
+            }, 14500);
+        }
+
+        function skipIntro() {
+            clearTimeout(introTimer);
+            const introSeq = document.getElementById('intro-sequence');
+            const mainContent = document.getElementById('main-content');
+            const skipBtn = document.getElementById('skip-intro-btn');
+
+            document.body.classList.add('intro-hide');
+            introSeq.classList.add('opacity-0');
+            skipBtn.classList.add('opacity-0', 'pointer-events-none');
+
+            setTimeout(() => {
+                introSeq.classList.add('hidden');
+                mainContent.classList.remove('opacity-0', 'pointer-events-none');
+            }, 1000);
+        }
+
+
+        // --- COURSE CARDS RENDERING & FILTERING ---
+        function renderCourses(items) {
+            const container = document.getElementById('course-grid');
+            container.innerHTML = '';
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-16 text-cinematic-cream/50 font-serif">
+                        <i class="fas fa-film text-4xl text-cinematic-gold/40 mb-3"></i>
+                        <p>未找到符合條件的大師課程劇集</p>
+                    </div>
+                `;
+                return;
+            }
+
+            items.forEach(course => {
+                const card = document.createElement('div');
+                card.className = "group relative bg-cinematic-deep border border-cinematic-gold/20 rounded-xl overflow-hidden hover:border-cinematic-gold transition-all duration-500 flex flex-col justify-between hover:shadow-2xl hover:shadow-cinematic-gold/10";
+                
+                card.innerHTML = `
+                    <div class="relative aspect-video overflow-hidden">
+                        <img src="${course.image}" alt="${course.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-cinematic-deep via-transparent to-black/40"></div>
+                        <span class="absolute top-3 left-3 bg-cinematic-burgundy/90 text-cinematic-gold text-[10px] font-cinematic uppercase tracking-widest px-3 py-1 rounded-full border border-cinematic-gold/30">
+                            ${course.badge}
+                        </span>
+                        <button onclick="openTrailerModal(${course.id})" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-xs">
+                            <div class="w-14 h-14 rounded-full bg-cinematic-gold text-black flex items-center justify-center text-lg shadow-xl transform group-hover:scale-110 transition-transform">
+                                <i class="fas fa-play ml-1"></i>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between text-xs text-cinematic-gold/80 font-cinematic mb-2">
+                                <span><i class="fas fa-user-ninja mr-1"></i>${course.director}</span>
+                                <span><i class="fas fa-star text-cinematic-gold mr-1"></i>${course.rating}</span>
+                            </div>
+                            <h3 class="text-xl font-bold font-serif text-cinematic-cream group-hover:text-cinematic-gold transition-colors">
+                                ${course.title}
+                            </h3>
+                            <p class="text-xs font-cinematic text-cinematic-cream/40 uppercase tracking-wider mt-1 mb-3">
+                                ${course.englishTitle}
+                            </p>
+                            <p class="text-xs text-cinematic-cream/70 font-serif line-clamp-2 mb-4 leading-relaxed">
+                                ${course.desc}
+                            </p>
+                        </div>
+
+                        <div class="pt-4 border-t border-cinematic-gold/10 flex items-center justify-between text-xs text-cinematic-cream/50 font-serif">
+                            <span><i class="far fa-clock mr-1"></i>${course.duration}</span>
+                            <button onclick="openTrailerModal(${course.id})" class="text-cinematic-gold hover:underline flex items-center space-x-1">
+                                <span>觀賞試映</span>
+                                <i class="fas fa-chevron-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Filter Logic
+        function filterCourses() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const cuisine = document.getElementById('cuisine-filter').value;
+            const level = document.getElementById('level-filter').value;
+
+            const filtered = courses.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(query) || 
+                                      item.director.toLowerCase().includes(query) || 
+                                      item.desc.toLowerCase().includes(query);
+                const matchesCuisine = cuisine === 'all' || item.cuisine === cuisine;
+                const matchesLevel = level === 'all' || item.level === level;
+
+                return matchesSearch && matchesCuisine && matchesLevel;
+            });
+
+            renderCourses(filtered);
+        }
+
+        document.getElementById('search-input').addEventListener('input', filterCourses);
+        document.getElementById('cuisine-filter').addEventListener('change', filterCourses);
+        document.getElementById('level-filter').addEventListener('change', filterCourses);
+
+
+        // --- TRAILER MODAL LOGIC ---
+        function openTrailerModal(courseId) {
+            const modal = document.getElementById('trailer-modal');
+            const title = document.getElementById('modal-title');
+            const subtitle = document.getElementById('modal-subtitle');
+            const instructor = document.getElementById('modal-instructor');
+            const poster = document.getElementById('modal-poster');
+
+            if (courseId === 'hero') {
+                title.textContent = "TASTE & CRAFT 品牌年度預告片 (Official Teaser)";
+                subtitle.textContent = "探索極致美食烹飪的電影級大師課";
+                instructor.textContent = "PRODUCED BY CULINARY EPIC STUDIO";
+                poster.src = "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80";
+            } else {
+                const course = courses.find(c => c.id === courseId);
+                if (course) {
+                    title.textContent = `${course.title} • 獨家試映`;
+                    subtitle.textContent = course.englishTitle;
+                    instructor.textContent = `DIRECTOR: ${course.director.toUpperCase()}`;
+                    poster.src = course.image;
+                }
+            }
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeTrailerModal() {
+            const modal = document.getElementById('trailer-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function playMockVideo() {
+            const desc = document.getElementById('modal-desc');
+            desc.innerHTML = `<span class="text-cinematic-gold animate-pulse"><i class="fas fa-spinner fa-spin mr-2"></i>正在從劇院級伺服器串流 4K HDR 視訊檔...</span>`;
+            setTimeout(() => {
+                desc.textContent = "預覽片段播放中 — 體會頂級食材在熾熱鐵板上的美妙聲響與細緻紋理。";
+            }, 1500);
+        }
+
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            initGrain();
+            runIntroSequence();
+            renderCourses(courses);
+        };
+    </script>
+</body>
+</html>

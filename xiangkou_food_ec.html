@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>巷口食光｜台灣美食選物</title>
+<style>
+:root{--ink:#29251f;--paper:#fffaf0;--red:#c9422e;--orange:#f2a33a;--green:#426b50;--muted:#81786d;--line:#eadfce;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}button,input,select{font:inherit}button{cursor:pointer;border:0}.wrap{max-width:1180px;margin:auto;padding:0 22px}.topline{background:var(--green);color:white;text-align:center;padding:9px;font-size:13px;letter-spacing:.08em}.nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 0;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:24px;letter-spacing:.03em}.brand-mark{background:var(--red);color:white;border-radius:50% 50% 45% 45%;width:42px;height:42px;display:grid;place-items:center;font-size:23px}.navlinks{display:flex;gap:22px;color:#62594f;font-size:14px}.navlinks a{color:inherit;text-decoration:none}.navright{display:flex;gap:9px;align-items:center}.iconbtn{background:white;border:1px solid var(--line);border-radius:999px;padding:10px 13px}.cartcount{background:var(--red);color:white;border-radius:50%;padding:1px 6px;font-size:11px;margin-left:4px}.hero{display:grid;grid-template-columns:1.02fr .98fr;gap:38px;align-items:center;padding:52px 0 48px}.eyebrow{color:var(--red);font-size:13px;font-weight:800;letter-spacing:.15em}.hero h1{font-size:clamp(38px,5.3vw,66px);line-height:1.14;letter-spacing:-.04em;margin:15px 0}.hero h1 em{font-style:normal;color:var(--red);position:relative}.hero p{color:var(--muted);line-height:1.9;max-width:470px}.search{display:flex;gap:8px;background:white;border:1px solid var(--line);padding:7px;border-radius:14px;max-width:470px;margin-top:25px}.search input{border:0;outline:0;flex:1;min-width:0;padding:8px 10px;background:transparent}.primary{background:var(--red);color:white;border-radius:10px;padding:12px 18px;font-weight:800}.primary:hover{background:#a93424}.hero-art{position:relative;min-height:370px;background:#f5dfb8;border-radius:26px;overflow:hidden;display:grid;place-items:center}.hero-art:before{content:"";position:absolute;width:310px;height:310px;border:1px dashed #c98b4d;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%)}.hero-food{font-size:clamp(115px,17vw,190px);filter:drop-shadow(0 18px 12px #8b4d2b30);z-index:1;transform:rotate(-7deg)}.sticker{position:absolute;background:var(--green);color:white;padding:13px 16px;border-radius:50%;font-size:13px;font-weight:800;line-height:1.4;text-align:center;right:9%;top:11%;transform:rotate(10deg)}.scribble{position:absolute;left:8%;bottom:11%;font-size:13px;font-weight:800;color:var(--red);transform:rotate(-8deg)}.stats{display:flex;gap:26px;margin-top:26px}.stat strong{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}.section{padding:30px 0 48px}.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:22px}.sectionhead h2{margin:7px 0 0;font-size:30px;letter-spacing:-.03em}.sectionhead p{margin:0;color:var(--muted);font-size:14px}.textlink{background:transparent;color:var(--red);font-weight:800}.categories{display:grid;grid-template-columns:repeat(6,1fr);gap:13px}.cat{background:white;border:1px solid var(--line);border-radius:16px;padding:20px 10px;text-align:center;transition:.2s}.cat:hover,.cat.active{border-color:var(--red);transform:translateY(-3px);box-shadow:0 8px 22px #6b3a1810}.cat .emoji{font-size:34px;display:block;margin-bottom:9px}.cat strong{font-size:14px}.cat small{display:block;color:var(--muted);font-size:11px;margin-top:5px}.productgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.product{background:white;border:1px solid var(--line);border-radius:18px;overflow:hidden;position:relative;transition:.2s}.product:hover{transform:translateY(-4px);box-shadow:0 12px 30px #4d31150d}.foodpic{height:170px;display:grid;place-items:center;font-size:76px;position:relative;background:#f7e7cf}.foodpic span{filter:drop-shadow(0 8px 7px #583a2520)}.tag{position:absolute;left:12px;top:12px;background:var(--red);color:white;font-size:11px;padding:5px 9px;border-radius:999px;font-weight:800}.productbody{padding:15px}.productmeta{font-size:11px;color:var(--green);font-weight:800;letter-spacing:.04em}.product h3{font-size:17px;margin:7px 0 4px}.desc{font-size:12px;color:var(--muted);min-height:34px;line-height:1.6}.rating{font-size:12px;color:#9a6a26;margin:10px 0}.buyrow{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid #f1e9de;padding-top:12px}.price{font-weight:900;font-size:19px}.price small{font-size:11px;color:var(--muted);font-weight:500}.add{background:#f9eee4;color:var(--red);border-radius:10px;padding:9px 12px;font-weight:900}.add:hover{background:var(--red);color:white}.story{display:grid;grid-template-columns:1fr 1fr;background:#f1e5d1;border-radius:24px;overflow:hidden;margin:18px 0 40px}.storyvisual{display:grid;place-items:center;min-height:265px;background:#e6cba1;font-size:105px;position:relative}.storyvisual:after{content:"TAIWAN LOCAL";position:absolute;bottom:18px;left:22px;font-size:11px;letter-spacing:.2em;font-weight:900;color:#715333}.storycopy{padding:35px;align-self:center}.storycopy h2{font-size:30px;margin:10px 0}.storycopy p{color:#756756;line-height:1.9;font-size:14px}.pill{display:inline-block;border:1px solid #d8c4a5;border-radius:999px;padding:7px 11px;font-size:12px;margin:3px}.newsletter{background:var(--green);color:white;border-radius:22px;padding:30px;display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:45px}.newsletter h2{margin:0 0 7px;font-size:25px}.newsletter p{margin:0;color:#d9e2d8;font-size:13px}.emailform{display:flex;background:white;border-radius:11px;padding:5px;max-width:400px;width:100%}.emailform input{border:0;outline:0;padding:10px;min-width:0;flex:1}.emailform button{background:var(--orange);color:#382919;border-radius:8px;padding:10px 14px;font-weight:900}.footer{border-top:1px solid var(--line);padding:24px 0 35px;display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:12px}.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);background:#29251f;color:white;padding:13px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:20;box-shadow:0 8px 30px #0002}.toast.show{opacity:1;transform:translate(-50%,0)}.overlay{position:fixed;inset:0;background:#211b16a8;z-index:30;display:none;justify-content:flex-end}.overlay.open{display:flex}.drawer{background:var(--paper);height:100%;width:min(430px,100%);padding:24px;overflow:auto}.drawhead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:15px}.drawhead h2{margin:0}.close{background:white;border:1px solid var(--line);border-radius:50%;width:36px;height:36px}.cartitem{display:flex;gap:12px;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}.cartemoji{font-size:34px;background:#f5e4cb;border-radius:12px;padding:8px}.cartitem .details{flex:1}.cartitem strong{display:block;font-size:14px}.cartitem small{color:var(--muted)}.qty{display:flex;align-items:center;gap:8px}.qty button{width:26px;height:26px;border-radius:7px;background:white;border:1px solid var(--line)}.carttotal{display:flex;justify-content:space-between;font-weight:900;font-size:20px;padding:22px 0}.checkout{width:100%;padding:15px}.empty{text-align:center;padding:50px 0;color:var(--muted)}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.filterbtn{background:white;border:1px solid var(--line);padding:8px 14px;border-radius:999px;font-size:13px}.filterbtn.active{background:var(--ink);color:white;border-color:var(--ink)}.hidden{display:none!important}
+@media(max-width:850px){.navlinks{display:none}.hero{grid-template-columns:1fr;padding-top:32px}.hero-art{min-height:290px}.categories{grid-template-columns:repeat(3,1fr)}.productgrid{grid-template-columns:repeat(2,1fr)}.story{grid-template-columns:1fr}.storyvisual{min-height:200px}.newsletter{align-items:flex-start;flex-direction:column}.emailform{max-width:none}}
+@media(max-width:460px){.wrap{padding:0 15px}.brand{font-size:20px}.hero h1{font-size:42px}.stats{gap:16px}.categories{gap:8px}.cat{padding:15px 5px}.productgrid{gap:10px}.foodpic{height:135px;font-size:60px}.productbody{padding:12px}.product h3{font-size:15px}.price{font-size:17px}.sectionhead h2{font-size:25px}.footer{flex-direction:column}.nav{padding:14px 0}}
+</style>
+</head>
+<body>
+<div class="topline">台灣好味，直接送到你家　✦　滿 NT$999 免運（示範活動）</div>
+<div class="wrap">
+<header class="nav">
+  <div class="brand"><div class="brand-mark">巷</div><span>巷口食光 <small style="display:block;font-size:10px;letter-spacing:.18em;color:#887b6b;font-weight:600">LOCAL TASTE MARKET</small></span></div>
+  <nav class="navlinks"><a href="#shop">逛逛美食</a><a href="#categories">美食分類</a><a href="#story">地方故事</a><a href="#about">關於我們</a></nav>
+  <div class="navright"><button class="iconbtn" id="searchJump" aria-label="搜尋">⌕ 搜尋</button><button class="iconbtn" id="openCart">🛒 購物車 <span class="cartcount" id="cartCount">0</span></button></div>
+</header>
+<main>
+<section class="hero">
+ <div><div class="eyebrow">✦ 從巷口開始，吃遍台灣</div><h1>把台灣的<br><em>好味道，</em>寄給你。</h1><p>從夜市熱騰騰的小吃，到職人慢慢做的地方伴手禮。每一口，都是一段值得分享的台灣故事。</p>
+ <div class="search"><input id="searchInput" placeholder="搜尋雞排、鳳梨酥、地方名店…" aria-label="搜尋美食"><button class="primary" id="searchBtn">找好味</button></div>
+ <div class="stats"><div class="stat"><strong>全台精選</strong><span>在地好店嚴選</span></div><div class="stat"><strong>一口故事</strong><span>認識每道美食</span></div><div class="stat"><strong>安心選物</strong><span>商品資訊透明</span></div></div>
+ </div>
+ <div class="hero-art"><div class="sticker">巷仔內<br>才知道</div><div class="hero-food">🍢</div><div class="scribble">✦ 台灣味，真心推薦！</div></div>
+</section>
+<section class="section" id="categories">
+ <div class="sectionhead"><div><div class="eyebrow">PICK YOUR CRAVING</div><h2>今天想吃哪一味？</h2></div><p>選個分類，開啟你的美食散步</p></div>
+ <div class="categories">
+  <button class="cat active" data-cat="全部"><span class="emoji">🍽️</span><strong>全部美食</strong><small>好味集合</small></button>
+  <button class="cat" data-cat="夜市小吃"><span class="emoji">🍢</span><strong>夜市小吃</strong><small>越吃越涮嘴</small></button>
+  <button class="cat" data-cat="甜點伴手禮"><span class="emoji">🍍</span><strong>甜點伴手禮</strong><small>送禮有心意</small></button>
+  <button class="cat" data-cat="地方名物"><span class="emoji">🏮</span><strong>地方名物</strong><small>一地一滋味</small></button>
+  <button class="cat" data-cat="飲品茶點"><span class="emoji">🧋</span><strong>飲品茶點</strong><small>日常小確幸</small></button>
+  <button class="cat" data-cat="冷凍宅配"><span class="emoji">🥟</span><strong>冷凍宅配</strong><small>在家也能吃</small></button>
+ </div>
+</section>
+<section class="section" id="shop">
+ <div class="sectionhead"><div><div class="eyebrow">THE NEIGHBORHOOD FAVORITES</div><h2>巷口人氣榜</h2><p style="margin-top:7px">人氣、口碑與在地風味，一次收藏。</p></div><button class="textlink" id="resetFilter">查看全部 ↗</button></div>
+ <div class="filters"><button class="filterbtn active" data-sort="featured">編輯精選</button><button class="filterbtn" data-sort="priceLow">價格由低到高</button><button class="filterbtn" data-sort="rating">高評價優先</button></div>
+ <div class="productgrid" id="productGrid"></div>
+ <p id="noResults" class="hidden" style="text-align:center;padding:30px;color:var(--muted)">找不到符合的美食，試試其他關鍵字吧！</p>
+</section>
+<section class="story" id="story"><div class="storyvisual">🧺🍜🏮</div><div class="storycopy"><div class="eyebrow">MORE THAN FOOD · MORE THAN A TASTE</div><h2>每一份美味，<br>都有一段地方故事。</h2><p>我們想讓你買到的不只是商品，更是市場裡的熱情、老店的手藝，以及小鎮裡代代相傳的味道。從產地、職人到餐桌，讓台灣好味被更多人看見。</p><span class="pill">#支持在地</span><span class="pill">#職人手作</span><span class="pill">#台灣味地圖</span></div></section>
+<section class="newsletter" id="about"><div><h2>訂閱「巷口報報」📮</h2><p>每週一封，帶你發現一間新店、一個地方好味。</p></div><form class="emailform" id="newsletterForm"><input id="email" type="email" placeholder="輸入你的 Email" required><button type="submit">訂閱報報</button></form></section>
+</main>
+<footer class="footer"><div><strong style="color:var(--ink)">巷口食光｜LOCAL TASTE MARKET</strong><div style="margin-top:6px">把台灣的好味道，寄給你。</div></div><div>關於我們　｜　配送與退換貨　｜　聯絡客服<br><span style="display:inline-block;margin-top:7px">© 2026 巷口食光・概念展示網站</span></div></footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<div class="overlay" id="cartOverlay"><aside class="drawer" aria-label="購物車"><div class="drawhead"><h2>你的美食袋 🛒</h2><button class="close" id="closeCart" aria-label="關閉">✕</button></div><div id="cartItems"></div><div id="cartFooter" class="hidden"><div class="carttotal"><span>商品小計</span><span id="cartTotal">NT$0</span></div><button class="primary checkout" id="checkout">前往結帳（示範）</button><p style="font-size:11px;color:var(--muted);line-height:1.7">此為互動原型，尚未連接真實付款、庫存或物流服務。</p></div></aside></div>
+<script>
+const products=[
+{id:1,name:"夜市脆皮雞排",emoji:"🍗",price:120,category:"夜市小吃",place:"台中・逢甲風味",desc:"外酥內嫩，追劇宵夜的好搭檔。",rating:4.9,reviews:286,tag:"人氣必吃",bg:"#f7dfbf"},
+{id:2,name:"古早味鳳梨酥",emoji:"🍍",price:320,category:"甜點伴手禮",place:"台南・職人烘焙",desc:"酸甜鳳梨餡，茶點與送禮都適合。",rating:4.8,reviews:194,tag:"送禮首選",bg:"#f7edb9"},
+{id:3,name:"手工花生糖",emoji:"🥜",price:180,category:"地方名物",place:"金門・傳統手藝",desc:"花生香氣飽滿，保留樸實古早味。",rating:4.7,reviews:118,tag:"職人手作",bg:"#efdfc7"},
+{id:4,name:"珍珠奶茶風味茶包",emoji:"🧋",price:220,category:"飲品茶點",place:"南投・茶香選物",desc:"茶韻清爽，讓日常多一點台灣味。",rating:4.6,reviews:92,tag:"編輯推薦",bg:"#e3e9d6"},
+{id:5,name:"手工水餃 30 入",emoji:"🥟",price:260,category:"冷凍宅配",place:"高雄・家常手作",desc:"家常內餡，忙碌日子快速上桌。",rating:4.8,reviews:153,tag:"冷凍宅配",bg:"#f0dfd1"},
+{id:6,name:"古早味芋頭酥",emoji:"🥮",price:280,category:"甜點伴手禮",place:"台中・糕餅老舖",desc:"層層酥香與綿密芋泥的相遇。",rating:4.7,reviews:101,tag:"限量手作",bg:"#e9dff0"},
+{id:7,name:"台南蝦餅分享包",emoji:"🍤",price:150,category:"地方名物",place:"台南・府城零嘴",desc:"酥脆鹹香，聚會分享剛剛好。",rating:4.6,reviews:87,tag:"府城好味",bg:"#f5dfb8"},
+{id:8,name:"夜市地瓜球組",emoji:"🍡",price:199,category:"冷凍宅配",place:"屏東・台灣地瓜",desc:"在家簡單加熱，享受外酥Q彈。",rating:4.9,reviews:209,tag:"回購熱門",bg:"#f3d7bb"}
+];
+let category="全部",query="",sort="featured",cart={};
+const $=s=>document.querySelector(s);
+const money=n=>"NT$"+n.toLocaleString("zh-TW");
+function renderProducts(){
+ let list=products.filter(p=>(category==="全部"||p.category===category)&&(`${p.name} ${p.category} ${p.place} ${p.desc}`).toLowerCase().includes(query.toLowerCase()));
+ if(sort==="priceLow")list.sort((a,b)=>a.price-b.price);if(sort==="rating")list.sort((a,b)=>b.rating-a.rating);
+ $("#productGrid").innerHTML=list.map(p=>`<article class="product"><div class="foodpic" style="background:${p.bg}"><span>${p.emoji}</span><b class="tag">${p.tag}</b></div><div class="productbody"><div class="productmeta">${p.place} · ${p.category}</div><h3>${p.name}</h3><div class="desc">${p.desc}</div><div class="rating">★ ${p.rating} <span style="color:#a39a8e">(${p.reviews} 則評價)</span></div><div class="buyrow"><div class="price">${money(p.price)} <small>/ 份</small></div><button class="add" onclick="addToCart(${p.id})">＋ 加入</button></div></div></article>`).join("");
+ $("#noResults").classList.toggle("hidden",list.length>0);
+}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.classList.remove("show"),2300)}
+function addToCart(id){cart[id]=(cart[id]||0)+1;updateCart();toast("已把美味放進購物車！")}
+function updateCart(){
+ let count=Object.values(cart).reduce((a,b)=>a+b,0);$("#cartCount").textContent=count;
+ const entries=products.filter(p=>cart[p.id]);$("#cartItems").innerHTML=entries.length?entries.map(p=>`<div class="cartitem"><div class="cartemoji">${p.emoji}</div><div class="details"><strong>${p.name}</strong><small>${money(p.price)} / 份</small></div><div class="qty"><button onclick="changeQty(${p.id},-1)" aria-label="減少">−</button><span>${cart[p.id]}</span><button onclick="changeQty(${p.id},1)" aria-label="增加">＋</button></div></div>`).join(""):`<div class="empty"><div style="font-size:48px">🧺</div><p>美食袋還是空的</p><small>去逛逛，把喜歡的台灣味帶回家。</small></div>`;
+ let total=entries.reduce((sum,p)=>sum+p.price*cart[p.id],0);$("#cartTotal").textContent=money(total);$("#cartFooter").classList.toggle("hidden",!entries.length);
+}
+function changeQty(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];updateCart()}
+function setCategory(c){category=c;document.querySelectorAll(".cat").forEach(b=>b.classList.toggle("active",b.dataset.cat===c));renderProducts();$("#shop").scrollIntoView({behavior:"smooth",block:"start"})}
+document.querySelectorAll(".cat").forEach(b=>b.addEventListener("click",()=>setCategory(b.dataset.cat)));
+document.querySelectorAll(".filterbtn").forEach(b=>b.addEventListener("click",()=>{sort=b.dataset.sort;document.querySelectorAll(".filterbtn").forEach(x=>x.classList.toggle("active",x===b));renderProducts()}));
+function doSearch(){query=$("#searchInput").value.trim();category="全部";document.querySelectorAll(".cat").forEach(b=>b.classList.toggle("active",b.dataset.cat==="全部"));renderProducts();$("#shop").scrollIntoView({behavior:"smooth"})}
+$("#searchBtn").addEventListener("click",doSearch);$("#searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")doSearch()});$("#searchJump").addEventListener("click",()=>{$("#searchInput").focus();window.scrollTo({top:0,behavior:"smooth"})});
+$("#resetFilter").addEventListener("click",()=>{query="";$("#searchInput").value="";setCategory("全部");sort="featured";document.querySelectorAll(".filterbtn").forEach(b=>b.classList.toggle("active",b.dataset.sort==="featured"));renderProducts()});
+$("#openCart").addEventListener("click",()=>$("#cartOverlay").classList.add("open"));$("#closeCart").addEventListener("click",()=>$("#cartOverlay").classList.remove("open"));$("#cartOverlay").addEventListener("click",e=>{if(e.target.id==="cartOverlay")$("#cartOverlay").classList.remove("open")});
+$("#checkout").addEventListener("click",()=>toast("示範結帳：正式版可在此串接地址、配送與付款流程。"));
+$("#newsletterForm").addEventListener("submit",e=>{e.preventDefault();toast("訂閱成功（示範）！期待與你分享台灣好味。");$("#email").value=""});
+renderProducts();updateCart();
+</script>
+</body>
+</html>
